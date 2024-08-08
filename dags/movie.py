@@ -75,7 +75,7 @@ with DAG(
     agg = BashOperator(
             task_id='agg',
             bash_command="""
-            echo "{{ds_nodash}}"
+            $SPARK_HOME/bin/spark-submit /home/hun/airflow_pyspark/movie_sum.py {{ds_nodash}}
             """
     )
 
