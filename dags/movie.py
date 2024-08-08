@@ -43,6 +43,7 @@ with DAG(
 
 
     def repartition(ds_nodash):
+        from pyspark_airflow.repartition import repartition, rm_dir
         df_row_cnt, read_path, write_path = repartition(ds_nodash)
         print(f'df_row_cnt:{df_row_cnt}')
         print(f'read_path:{read_path}')
@@ -50,10 +51,11 @@ with DAG(
 
 
     def check_fun(ds_nodash):
+        import os
+        from pyspark_airflow.repartition import repartition, rm_dir
         rm = rm_dir(dir_path)
         #ld = kwargs['ds_nodash']
         #OS의 경로 가져오는 방법
-        import os
         home_dir = os.path.expanduser("~")
         path = f'{home_dir}/data/movie/repartition/load_dt={ds_nodash}'
         #path = os.path.join(home_dir, f"tmp/test_parquet/load_dt={ld}")
@@ -69,9 +71,9 @@ with DAG(
     end = EmptyOperator(task_id='end', trigger_rule="all_done")
 
 
-    ckeck_op = BranchPythonOperator(
-            task_id='ckeck.op',
-            python_callable=ckeck_fun
+    check_op = BranchPythonOperator(
+            task_id='check.op',
+            python_callable=check_fun
             )
 
 
@@ -99,11 +101,11 @@ with DAG(
 
     rm_dir = BashOperator(
             task_id='rm.dir',
-            bash_command='rm -rf ~/data/movie_data/repartition/load_dt={{ds_nodash}}'
+            bash_command='rm -rf ~/data/movie/repartition/load_dt={{ds_nodash}}'
     )
 
 
 
 ################################################3
 
-    start >> ckeck_op >> [rm_dir,re_partition] >> join_df >> agg >> end
+    start >> check_op >> [rm_dir,re_partition] >> join_df >> agg >> end
