@@ -32,8 +32,8 @@ with DAG(
     },
     description='spark movie DAG',
     schedule_interval=timedelta(days=1),
-    start_date=datetime(2020, 1, 1),
-    end_date=datetime(2020, 1, 5),
+    start_date=datetime(2015, 1, 1),
+    end_date=datetime(2015, 1, 5),
     catchup=True,
     tags=['spark'],
 ) as dag:
