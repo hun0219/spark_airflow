@@ -18,6 +18,8 @@ from airflow.operators.python import (
     BranchPythonOperator,
 )
 
+from pyspark_airflow.repartition import repartition, rm_dir
+
 
 with DAG(
     'pyspark_movie',
@@ -41,19 +43,37 @@ with DAG(
 
 
     def repartition(ds_nodash):
-        from pyspark_airflow.repartition import repartition
         df_row_cnt, read_path, write_path = repartition(ds_nodash)
         print(f'df_row_cnt:{df_row_cnt}')
         print(f'read_path:{read_path}')
         print(f'write_path:{write_path}')
 
 
+    def check_fun(ds_nodash):
+        rm = rm_dir(dir_path)
+        #ld = kwargs['ds_nodash']
+        #OS의 경로 가져오는 방법
+        import os
+        home_dir = os.path.expanduser("~")
+        path = f'{home_dir}/data/movie/repartition/load_dt={ds_nodash}'
+        #path = os.path.join(home_dir, f"tmp/test_parquet/load_dt={ld}")
+        if os.path.exists(path):
+            return "rm.dir" #task_id #rm_dor.task_id 도 가능
+        else:
+            return "repartition" #task_id
 
 
 ##########################################################################
 
     start = EmptyOperator(task_id='start')
     end = EmptyOperator(task_id='end', trigger_rule="all_done")
+
+
+    ckeck_op = BranchPythonOperator(
+            task_id='ckeck.op',
+            python_callable=ckeck_fun
+            )
+
 
     re_partition = PythonVirtualenvOperator(
             task_id='re.partition',
@@ -66,7 +86,7 @@ with DAG(
     join_df = BashOperator(
             task_id='join.df',
             bash_command="""
-            echo "{{ds_nodash}}"
+            $SPARK_HOME/bin/spark-submit /home/hun/airflow_pyspark.py {{ds_nodash}}
             """
     )
     
@@ -77,7 +97,13 @@ with DAG(
             """
     )
 
+    rm_dir = BashOperator(
+            task_id='rm.dir',
+            bash_command='rm -rf ~/data/movie_data/repartition/load_dt={{ds_nodash}}'
+    )
+
+
 
 ################################################3
 
-    start >> re_partition >> join_df >> agg >>end
+    start >> ckeck_op >> [rm_dir,re_partition] >> join_df >> agg >> end

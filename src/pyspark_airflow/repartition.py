@@ -5,7 +5,7 @@ import shutil
 def repartition(load_dt, from_path='data/movie/data/extract'):
     home_dir = os.path.expanduser("~")
     read_path = f'{home_dir}/{from_path}/load_dt={load_dt}'
-    write_base = f'{home_dir}/data/movie_data/repartition'
+    write_base = f'{home_dir}/data/movie/repartition'
     write_path = f'{write_base}/load_dt={load_dt}'
 
     df = pd.read_parquet(read_path)
