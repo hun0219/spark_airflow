@@ -50,31 +50,11 @@ with DAG(
         print(f'write_path:{write_path}')
 
 
-    def check_fun(ds_nodash):
-        import os
-        from pyspark_airflow.repartition import repartition, rm_dir
-        rm = rm_dir(dir_path)
-        #ld = kwargs['ds_nodash']
-        #OS의 경로 가져오는 방법
-        home_dir = os.path.expanduser("~")
-        path = f'{home_dir}/data/movie/repartition/load_dt={ds_nodash}'
-        #path = os.path.join(home_dir, f"tmp/test_parquet/load_dt={ld}")
-        if os.path.exists(path):
-            return "rm.dir" #task_id #rm_dor.task_id 도 가능
-        else:
-            return "repartition" #task_id
-
-
 ##########################################################################
 
     start = EmptyOperator(task_id='start')
     end = EmptyOperator(task_id='end', trigger_rule="all_done")
 
-
-    check_op = BranchPythonOperator(
-            task_id='check.op',
-            python_callable=check_fun
-            )
 
 
     re_partition = PythonVirtualenvOperator(
@@ -108,4 +88,4 @@ with DAG(
 
 ################################################3
 
-    start >> check_op >> [rm_dir,re_partition] >> join_df >> agg >> end
+    start >> re_partition >> join_df >> agg >> end
