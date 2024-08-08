@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import shutil
 
-def repartition(load_dt, from_path='/data/movie_data/extract'):
+def repartition(load_dt, from_path='data/movie_data/extract'):
     home_dir = os.path.expanduser("~")
     read_path = f'{home_dir}/{from_path}/load_dt={load_dt}'
     write_base = f'{home_dir}/data/movie_data/repartition'
