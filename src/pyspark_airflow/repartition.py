@@ -12,7 +12,7 @@ def repartition(load_dt, from_path='data/movie/data/extract'):
     df['load_dt'] = load_dt
     rm_dir(write_path)
     df.to_parquet(write_path, partition_cols=['load_dt','multiMovieYn','repNationCd'])
-    return len(df), read_path, wirte_path
+    return len(df), read_path, write_path
 
 def rm_dir(dir_path):
     if os.path.exists(dir_path):
