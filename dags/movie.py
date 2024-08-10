@@ -79,11 +79,11 @@ with DAG(
             """
     )
 
-    rm_dir = BashOperator(
-            task_id='rm.dir',
-            bash_command='rm -rf ~/data/movie/repartition/load_dt={{ds_nodash}}'
-    )
-
+#    rm_dir = BashOperator(
+#            task_id='rm.dir',
+#            bash_command='rm -rf ~/data/movie/repartition/load_dt={{ds_nodash}}'
+#    )
+#
 
 
 ################################################3
